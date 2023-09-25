@@ -24,7 +24,10 @@ export async function POST(request: NextRequest) {
 
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
-      return NextResponse.json({ error: "User doesn't exists!", status: 400 });
+      return NextResponse.json(
+        { error: "User doesn't exists!" },
+        { status: 400 }
+      );
     }
 
     const validatePassword = await bcryptjs.compare(
@@ -38,7 +41,7 @@ export async function POST(request: NextRequest) {
         email: existingUser.email,
       };
 
-      const token = await jwt.sign(userData, process.env.TOKEN_SECRER!, {
+      const token = jwt.sign(userData, process.env.TOKEN_SECRER!, {
         expiresIn: "3h",
       });
 
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          message: "User created successfully!",
+          message: "Invalid credentials!",
           success: false,
         },
         { status: 400 }

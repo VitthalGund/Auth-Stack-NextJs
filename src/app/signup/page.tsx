@@ -9,12 +9,12 @@ import axios from "axios";
 export default function SignupPage() {
     const router = useRouter();
     const [user, setUser] = useState({
-        // email: "vitthal@vitthal.com",
-        email: "",
-        // password: "VitthalGund",
-        password: "",
-        // username: "vitthal"
-        username: ""
+        email: "vitthalgund30@gmail.com",
+        // email: "",
+        password: "VitthalGund",
+        // password: "",
+        username: "vitthal"
+        // username: ""
     });
 
     const [buttonDisable, setButtonDisable] = useState(false);

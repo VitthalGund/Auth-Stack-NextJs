@@ -35,6 +35,7 @@ export default function LoginPage() {
             setLoading(true);
             setButtonDisable(true);
             const resp = await axios.post("/api/user/login", user);
+            // console.log(resp);
             if (resp.data.success) {
                 toast.success("Login Successfully!");
                 router.push(`/profile/${resp.data.username}`);
