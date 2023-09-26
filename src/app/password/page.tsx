@@ -1,17 +1,20 @@
 "use client";
 import Link from "next/link";
-import React, { ChangeEvent, useState, useEffect } from "react";
+import React, { ChangeEvent, useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 
 
-export default function LoginPage() {
+export default function Password() {
     const router = useRouter();
     const [user, setUser] = useState({
-        email: "",
-        password: ""
+        password: "",
+        confirmPassword: ""
     });
+    const [token, setToken] = useState("");
+    const password = useRef<HTMLInputElement>(null);
+    const confirmPassword = useRef<HTMLInputElement>(null);
 
     const onUserChange = (e: ChangeEvent<HTMLInputElement>) => {
         setUser({ ...user, [e.target.name]: e.target.value })
@@ -21,29 +24,32 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const { email, password } = user;
-        const isEmailValid = email.match(/^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/);
+        const { password, confirmPassword } = user;
         const isPasswordValid = password.length > 8;
+        const isEqual = password === confirmPassword;
 
-        setButtonDisable(!(isEmailValid && isPasswordValid));
+        setButtonDisable(!(isPasswordValid && isEqual));
     }, [user]);
 
+    useEffect(() => {
+        const urlToken = window.location.search.split("=")[1];
+        setToken(urlToken ?? "");
+        console.log(urlToken)
+    }, [])
 
-    const onLogin = async () => {
-        let id = toast.loading("validating your credentials!");
+    const ResetPassword = async () => {
+        let id = toast.loading("Requesting changes!");
         try {
             setLoading(true);
             setButtonDisable(true);
-            const resp = await axios.post("/api/user/login", user);
-            // console.log(resp);
-            if (resp.data.success && resp.data.isVerified) {
-                toast.success("Login Successfully!");
-                router.push(`/profile/${resp.data.username}`);
-            } else if (resp.data.success) {
-                toast.error("Your Profile is verified!");
-                toast.error("Try by changes password to verify account!");
+            console.log()
+            const resp = await axios.post("/api/user/verifypassword", { token, password: user.password });
+            console.log(resp);
+            if (resp.data.success) {
+                toast.success("Password changed Successfully!");
+                router.push(`/login`);
             } else {
-                toast.error(resp.data.message);
+                toast.error(resp.data.error);
             }
         } catch (error: any) {
             toast.error(error.response.data.message);
@@ -54,6 +60,14 @@ export default function LoginPage() {
             toast.dismiss(id);
         }
     };
+    const changeType = (e: string) => {
+        if (e === "password" && password.current) {
+            password.current.type = password.current.type === "password" ? "text" : "password";
+        }
+        if (e === "confirmPassword" && confirmPassword.current) {
+            confirmPassword.current.type = confirmPassword.current.type === "password" ? "text" : "password";
+        }
+    }
     return (
         <>
             <div className="flex flex-col items-center justify-center max-h-screen py-2">
@@ -90,35 +104,43 @@ export default function LoginPage() {
                     />
                     <button type="button"
                         className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-                        onClick={onLogin} disabled={buttonDisable}>Login</button>
+                        onClick={ResetPassword} disabled={buttonDisable}>Login</button>
                     <p>Don&apos;t  have a Account?<Link href="/signup" className="text-blue-700">SignUp</Link></p> */}
                 <section className="bg-gray-50 min-h-screen flex items-center justify-center">
                     {/* <!--     Login Container --> */}
                     <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
                         {/* <!--       Form --> */}
                         <div className="md:w-1/2 px-16">
-                            <h2 className="font-bold text-2xl text-[#002D74]">{loading ? "Processing" : "Login"}</h2>
-                            <p className="text-sm mt-4 text-[#002D74]">An account allows users to enjoy all the services without any ads for free!</p>
-
+                            <h2 className="font-bold text-2xl text-[#002D74]">{loading ? "Processing" : "Reset Password"}</h2>
                             <form action="" className="flex flex-col gap-4">
-                                <input type="text" name="email" placeholder="Email" className="p-2 mt-8 rounded-xl border-0"
-                                    value={user.email}
-                                    onChange={(e) => onUserChange(e)}
-                                    autoComplete="on"
-                                />
                                 <div className="relative">
                                     <input type="password" name="password" placeholder="Password" className="p-2 rounded-xl border-0 w-full"
                                         value={user.password}
                                         onChange={(e) => onUserChange(e)}
                                         autoComplete="on"
+                                        ref={password}
+                                        minLength={8}
                                     />
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2" viewBox="0 0 16 16">
+                                    <svg onClick={() => changeType("password")} name="password" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2" viewBox="0 0 16 16">
                                         <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
                                         <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
                                     </svg>
                                 </div>
-                                <button className="bg-blue-500 hover:bg-blue-700 rounded-xl text-white py-2 hover:scale-105 duration-300 disabled:cursor-not-allowed"
-                                    onClick={onLogin} disabled={buttonDisable}>Login</button>
+                                <div className="relative">
+                                    <input type="password" name="confirmPassword" placeholder="Confirm Password" className="p-2 rounded-xl border-0 w-full"
+                                        value={user.confirmPassword}
+                                        onChange={(e) => onUserChange(e)}
+                                        autoComplete="on"
+                                        ref={confirmPassword}
+                                        minLength={8}
+                                    />
+                                    <svg onClick={() => changeType("confirmPassword")} name="confirmPassword" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="gray" className="bi bi-eye absolute top-1/2 right-3 -translate-y-1/2" viewBox="0 0 16 16">
+                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+                                    </svg>
+                                </div>
+                                <button type="button" className="bg-blue-500 hover:bg-blue-700 rounded-xl text-white py-2 hover:scale-105 duration-300 disabled:cursor-not-allowed"
+                                    onClick={ResetPassword} disabled={buttonDisable}>Verify!</button>
                             </form>
 
                             {/* <div className="mt-10 grid grid-cols-3 items-center text-gray-500">
@@ -137,12 +159,7 @@ export default function LoginPage() {
                                     Login with google
                                 </button> */}
 
-                            <Link href={"/forgot"} className="mt-5 text-xs border-b py-4 border-gray-400">Forgot your password?</Link>
 
-                            <div className="text-xs flex justify-between items-center mt-3">
-                                <p>Don&apos;t have an account?</p>
-                                <Link className="py-2 px-5 bg-white rounded-xl hover:scale-110 duration-300" href={"/signup"}>Register</Link>
-                            </div>
                         </div>
 
                         {/* <!--       Image --> */}

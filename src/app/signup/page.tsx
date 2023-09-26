@@ -45,12 +45,12 @@ export default function SignupPage() {
             const resp = await axios.post("/api/user/signup", user);
             if (resp.data.success) {
                 toast.success("User Account Created Successfully!");
-                router.push("/login");
+                toast.success("Check your Email to verify the account!");
             } else {
                 toast.error(resp.data.error);
             }
         } catch (error: any) {
-            toast.error(error.message);
+            toast.error(error.response.data.message);
             toast.dismiss(id);
         } finally {
             setLoading(false);

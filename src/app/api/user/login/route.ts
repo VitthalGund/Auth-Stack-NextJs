@@ -19,14 +19,20 @@ export async function POST(request: NextRequest) {
     console.log(`email: ${email}\npassword: ${password}`);
 
     if (!email || !password) {
-      return NextResponse.json({ error: "insufficient details" });
+      return NextResponse.json({
+        message: "insufficient details",
+        success: false,
+      });
     }
 
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return NextResponse.json(
-        { error: "User doesn't exists!" },
-        { status: 400 }
+        {
+          message: "User doesn't exists!",
+          success: false,
+        },
+        { status: 401 }
       );
     }
 
@@ -49,6 +55,7 @@ export async function POST(request: NextRequest) {
         message: "Login successfully",
         success: true,
         username: existingUser.username,
+        isVerified: existingUser.isVerified,
       });
 
       response.cookies.set("token", token, { httpOnly: true });
@@ -59,10 +66,11 @@ export async function POST(request: NextRequest) {
           message: "Invalid credentials!",
           success: false,
         },
-        { status: 400 }
+        { status: 401 }
       );
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message, status: 500 });
+    // console.log(error);
+    return NextResponse.json({ message: error.message, status: 500 });
   }
 }
