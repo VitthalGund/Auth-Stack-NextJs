@@ -1,6 +1,6 @@
 # Auth-Stack-NextJs
 
-Completed Authentication solution using next. Auth-stack-NextJs is boiler plat code of completed authentication system which developers can use to save their time building authentication system again and again for their next NextJS project.
+Completed Authentication solution using Next JS. Auth-stack-NextJs is boiler plat code of completed authentication system which developers can use to save their time building authentication system again and again for their next NextJS project.
 
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
