@@ -94,7 +94,7 @@ export default function LoginPage() {
                             <p className="text-sm mt-4 text-[#002D74]">An account allows users to enjoy all the services without any ads for free!</p>
 
                             <form action="" className="flex flex-col gap-4">
-                                <input type="text" name="email" placeholder="Email" className="p-2 mt-8 rounded-xl border-0"
+                                <input type="email" name="email" placeholder="Email" className="p-2 mt-8 rounded-xl border-0 w-full"
                                     value={user.email}
                                     onChange={(e) => onUserChange(e)}
                                     autoComplete="on"
