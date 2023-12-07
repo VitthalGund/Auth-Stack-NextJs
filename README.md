@@ -1,7 +1,3 @@
-Certainly! Below is the README file for the Auth Stack Next.js version, following the format and tone you provided:
-
----
-
 # Auth Stack - Next.js Version
 
 ![Auth Stack Logo](https://github.com/VitthalGund/Auth-Stack/assets/97181033/6f2da7ff-c0c0-46fe-88a1-740e5a1060b8)
